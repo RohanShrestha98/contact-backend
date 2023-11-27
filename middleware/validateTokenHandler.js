@@ -3,15 +3,16 @@ const jwt = require("jsonwebtoken");
 
 const validateToken = asyncHandler(async (req, res, next) => {
   let token;
-  console.log("object", req.headers);
   let authHeader = req.headers.Authorization || req.headers.authorization;
   if (authHeader && authHeader.startsWith("Bearer")) {
     token = authHeader.split(" ")[1];
-    jwt.verify(token, process.env.ACCESS_TOKEN_SECERT, (err, decoded) => {
+    console.log("token", token);
+    jwt.verify(token, process.env.ACCESS_TOKEN, (err, decoded) => {
       if (err) {
         res.status(401);
         throw new Error("User is not authorized");
       }
+      console.log("decoded", decoded);
       req.user = decoded.user;
       next();
     });

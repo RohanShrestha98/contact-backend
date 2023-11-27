@@ -20,14 +20,12 @@ const registerUser = asyncHandler(async (req, res) => {
 
   //Hash password
   const hashedPassword = await bcrypt.hash(password, 10);
-  console.log("Hashed Password: ", hashedPassword);
   const user = await User.create({
     username,
     email,
     password: hashedPassword,
   });
 
-  console.log(`User created ${user}`);
   if (user) {
     res.status(201).json({ _id: user.id, email: user.email, success: true });
   } else {
@@ -50,7 +48,11 @@ const loginUser = asyncHandler(async (req, res) => {
   if (user && (await bcrypt.compareSync(password, user.password))) {
     const accessToken = jwt.sign(
       {
-        email: email,
+        user: {
+          email: email,
+          username: user.username,
+          id: user._id,
+        },
       },
       process.env.ACCESS_TOKEN,
       { expiresIn: "300s" }
